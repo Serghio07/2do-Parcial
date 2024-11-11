@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Análisis de Movimientos</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .graph-container {
+            height: 500px;
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: white;
+        }
+        .graph-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4a5568;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">
+            Dashboard de Movimientos de Joystick
+        </h1>
+
+        <!-- Grid de gráficos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Distribución de Movimientos -->
+            <div class="graph-container">
+                <h2 class="graph-title">Distribución de Movimientos</h2>
+                <div id="grafico_movimientos"></div>
+            </div>
+            <!-- Movimiento Frecuente -->
+            <div class="graph-container">
+                <h2 class="graph-title">Movimiento Frecuente</h2>
+                <div id="grafico_frecuente"></div>
+            </div>
+            <!-- Duración de Movimientos -->
+            <div class="graph-container">
+                <h2 class="graph-title">Duración de Movimientos</h2>
+                <div id="grafico_duracion"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function actualizarGraficos() {
+            console.log("Ejecutando actualizarGraficos");
+            fetch(`/datos_grafico`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error en datos_grafico:", data.error);
+                        return;
+                    }
+                    Plotly.newPlot('grafico_movimientos', JSON.parse(data.movimientos).data, JSON.parse(data.movimientos).layout);
+                    Plotly.newPlot('grafico_frecuente', JSON.parse(data.frecuente).data, JSON.parse(data.frecuente).layout);
+                    Plotly.newPlot('grafico_duracion', JSON.parse(data.duracion).data, JSON.parse(data.duracion).layout);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', actualizarGraficos);
+    </script>
+</body>
+</html>
